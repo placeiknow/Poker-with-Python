@@ -80,7 +80,7 @@ class Poker:                    #default blinds 5/10
             blind_states.append(i.blind_state)
         for k in range(0, len(blind_states)):
             if blind_states[k] == 1:
-                blind_states[k] = 2
+                blind_states[k] = 0
                 blind_states[k-1] = 1
             elif blind_states[k] == 2:
                 blind_states[k] = 1
@@ -89,6 +89,14 @@ class Poker:                    #default blinds 5/10
                 blind_states[k] = 0
 
     def give_blinds(self):
+        m = random.randint(0, len(self.players) - 1)
+        for i in self.players:
+            if i == m:
+                i.blind_state = 1
+            elif i == m + 1:
+                i.blind_state = 2
+            else:
+                i.blind_state = 0
         for i in self.players:
             if i.blind_state == 1:
                 print(f"{i.name} is small blind!")
@@ -100,6 +108,10 @@ class Poker:                    #default blinds 5/10
                 i.pot_state()
                 self.pot_size += self.big_blind
                 i.reduce_balance(self.big_blind)
+        for i in range(0, len(self.players)):
+            if self.players[i].blind_state == 2:
+                self.player_turn[i+1] = self.players[i].turn == 1
+                
     
     def bet_round(self):
         for i in self.players:
@@ -112,6 +124,19 @@ class Poker:                    #default blinds 5/10
                 print("Pot size: " + str(self.pot_size))
                 print("Betting...")
                 #here
+                x = input("Do you want to call, raise or fold? (c/r/f)")
+                if x == "c":
+                    i.reduce_balance(self.pot_size)
+                    self.pot_size += self.pot_size
+                elif x == "r":
+                    y = int(input("How much do you want to raise?"))
+                    i.raise_pot(y)
+                    self.pot_size += y
+                elif x == "f":
+                    i.folded = True
+                else:
+                    print("Invalid input!")
+                    continue
        
     
    
@@ -122,7 +147,7 @@ class player:
         self.__balance = 1000
         self.__hand = []
         self.blind_state = 2
-        self.turn = 1
+        self.turn = 0
         self.__hand_worth = 0
         self.folded = False
     def add_hand(self, hands):
@@ -286,7 +311,7 @@ def poker_game():
                 print("Exiting game...")
             else:
                 continue
-#poker_game()
+poker_game()
 
 
 
