@@ -299,12 +299,48 @@ class GamePage(Frame):
             card1 = ImageTk.PhotoImage(Image.open(str("cards\\default0.png")).resize((55, 85), Image.LANCZOS))
             self.cc_5.image = card1
             self.cc_5.configure(image=card1)
-            self.restart = False
+            self.restart = False            
         if game.round_ended:
             time.sleep(0.3)
             self.new_round_label.lift(self.action_cover_label)
             self.button_y.lift(self.action_cover_label)
             self.button_n.lift(self.action_cover_label)
+            
+            # Show all player cards at the end of the round
+            for i in range(4):
+                try:
+                    if i < len(game.list_of_players) and len(game.list_of_players[i].cards) > 0:
+                        # First card
+                        card_attr = f"card1_p{i}"
+                        if hasattr(self, card_attr):
+                            card_path = f"cards\\{str(game.list_of_players[i].cards[0])}.png"
+                            card_img = ImageTk.PhotoImage(Image.open(card_path).resize((55, 85), Image.LANCZOS))
+                            getattr(self, card_attr).image = card_img
+                            getattr(self, card_attr).configure(image=card_img)
+                        
+                        # Second card
+                        if len(game.list_of_players[i].cards) > 1:
+                            card_attr = f"card2_p{i}"
+                            if hasattr(self, card_attr):
+                                card_path = f"cards\\{str(game.list_of_players[i].cards[1])}.png"
+                                card_img = ImageTk.PhotoImage(Image.open(card_path).resize((55, 85), Image.LANCZOS))
+                                getattr(self, card_attr).image = card_img
+                                getattr(self, card_attr).configure(image=card_img)
+                except Exception as e:
+                    print(f"Error loading cards for player {i} at round end: {e}")
+            
+            # Make sure all community cards are shown
+            try:
+                for i in range(min(5, len(game.cards))):
+                    card_attr = f"cc_{i+1}"
+                    if hasattr(self, card_attr):
+                        card_path = f"cards\\{str(game.cards[i])}.png"
+                        card_img = ImageTk.PhotoImage(Image.open(card_path).resize((55, 85), Image.LANCZOS))
+                        getattr(self, card_attr).image = card_img
+                        getattr(self, card_attr).configure(image=card_img)
+            except Exception as e:
+                print(f"Error loading community cards at round end: {e}")
+                
             winners = []
             scores = []
             for player in game.list_of_players_not_out:
@@ -376,27 +412,41 @@ class GamePage(Frame):
         except IndexError:
             pass
         
-        # Update player cards
+        # Update player cards - modified to only show current player's cards
         try:
+            # First set all cards to default (face down)
+            default_card_img = ImageTk.PhotoImage(Image.open("cards\\default0.png").resize((55, 85), Image.LANCZOS))
+            
             for i in range(4):
-                try:
-                    # First card for each player
-                    card_attr = f"card1_p{i}"
-                    if hasattr(self, card_attr) and i < len(game.list_of_players) and len(game.list_of_players[i].cards) > 0:
-                        card_path = f"cards\\{str(game.list_of_players[i].cards[0])}.png"
+                if hasattr(self, f"card1_p{i}"):
+                    getattr(self, f"card1_p{i}").image = default_card_img
+                    getattr(self, f"card1_p{i}").configure(image=default_card_img)
+                
+                if hasattr(self, f"card2_p{i}"):
+                    getattr(self, f"card2_p{i}").image = default_card_img
+                    getattr(self, f"card2_p{i}").configure(image=default_card_img)
+            
+            # Now show only the current player's cards
+            current_player_index = game.list_of_players.index(game.acting_player)
+            
+            if current_player_index < 4 and len(game.acting_player.cards) > 0:
+                # First card
+                card_attr = f"card1_p{current_player_index}"
+                if hasattr(self, card_attr):
+                    card_path = f"cards\\{str(game.acting_player.cards[0])}.png"
+                    card_img = ImageTk.PhotoImage(Image.open(card_path).resize((55, 85), Image.LANCZOS))
+                    getattr(self, card_attr).image = card_img
+                    getattr(self, card_attr).configure(image=card_img)
+                
+                # Second card
+                if len(game.acting_player.cards) > 1:
+                    card_attr = f"card2_p{current_player_index}"
+                    if hasattr(self, card_attr):
+                        card_path = f"cards\\{str(game.acting_player.cards[1])}.png"
                         card_img = ImageTk.PhotoImage(Image.open(card_path).resize((55, 85), Image.LANCZOS))
                         getattr(self, card_attr).image = card_img
                         getattr(self, card_attr).configure(image=card_img)
-                    
-                    # Second card for each player
-                    card_attr = f"card2_p{i}"
-                    if hasattr(self, card_attr) and i < len(game.list_of_players) and len(game.list_of_players[i].cards) > 1:
-                        card_path = f"cards\\{str(game.list_of_players[i].cards[1])}.png"
-                        card_img = ImageTk.PhotoImage(Image.open(card_path).resize((55, 85), Image.LANCZOS))
-                        getattr(self, card_attr).image = card_img
-                        getattr(self, card_attr).configure(image=card_img)
-                except Exception as e:
-                    print(f"Error loading cards for player {i}: {e}")
+                        
         except Exception as e:
             print(f"Error in player card loading: {e}")
         
