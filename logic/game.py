@@ -565,4 +565,12 @@ class Game(object):
         if self.big_blind_amount > self.big_blind.chips:
             self.big_blind.stake += self.big_blind.chips
             self.highest_stake = self.big_blind.chips
-            self.pot
+            self.pot += self.big_blind.chips
+            self.big_blind.chips = 0
+            print(f"{self.big_blind.name} is all-in!")
+            self.big_blind.all_in = True
+        else:
+            self.big_blind.chips -= self.big_blind_amount
+            self.big_blind.stake += self.big_blind_amount
+            self.highest_stake = self.big_blind_amount
+            self.pot += self.big_blind_amount
