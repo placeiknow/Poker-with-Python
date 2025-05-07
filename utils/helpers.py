@@ -9,24 +9,34 @@ def score_interpreter(player):
     mod1 = list_of_values_to_interpret[player.score[1]]
     mod2 = list_of_values_to_interpret[player.score[2]]
     mod3 = list_of_values_to_interpret[player.score[3]]
+    # High card
     if player.score[0] == 0:
         return hand_type + ": " + mod3
+    # pair
     if player.score[0] == 1:
         return hand_type + ": " + mod1 + "s"
+    # two pair
     if player.score[0] == 2:
         return hand_type + ": " + mod1 + "s" + " and " + mod2 + "s"
+    # three of a kind
     if player.score[0] == 3:
         return hand_type + ": " + mod1 + "s"
+    # straight
     if player.score[0] == 4:
         return hand_type + ": " + mod1 + " High"
+    # flush
     if player.score[0] == 5:
         return hand_type + ": " + mod1 + " High"
+    # full house
     if player.score[0] == 6:
         return hand_type + ": " + mod1 + "s" + " and " + mod2 + "s"
+    # four of a kind
     if player.score[0] == 7:
         return hand_type + ": " + mod1 + "s"
+    # strraight flush
     if player.score[0] == 8:
         return hand_type + ": " + mod1 + " High"
+    # royal flush
     if player.score[0] == 9:
         return hand_type
 
